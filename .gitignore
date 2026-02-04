@@ -1,0 +1,12 @@
+# Ignore VSCode settings
+.vscode/
+
+# Build artifacts
+*.exe
+*.o
+*.obj
+
+# Temporary run output (results.txt is kept for test results in repo)
+run_out.txt
+run_err.txt
+test_out.txt
