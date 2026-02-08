@@ -91,6 +91,7 @@ public:
         if (value >= 0 && value < static_cast<int>(nodeMapping.size()))
             nodeMapping[value] = newNode;
         root = merge(root, newNode);
+        if (root) root->prev = nullptr;  // root has no parent
         opCount++;
     }
 
@@ -111,6 +112,7 @@ public:
             first = root->sibling;
         }
         root = first ? twoPassMerge(first) : nullptr;
+        if (root) root->prev = nullptr;  // new root must not point at deleted oldRoot
         delete oldRoot;
         opCount++;
         return true;
@@ -138,6 +140,7 @@ public:
 
         // Merge detached node with root (single root; no sibling chain in our invariant).
         root = merge(node, root);
+        if (root) root->prev = nullptr;  // root has no parent
         opCount++;
     }
 
