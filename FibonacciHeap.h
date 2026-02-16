@@ -4,6 +4,9 @@
 #include "PriorityQueue.h"
 #include <cmath>
 #include <vector>
+using std::vector;
+using std::log2;
+using std::swap;
 
 template <typename T>
 class FibonacciHeap : public PriorityQueue<T> {
@@ -13,19 +16,17 @@ private:
         T value;
         int degree;
         bool marked;
-
         Node* parent;
         Node* child;
         Node* left;
         Node* right;
-
         Node(int k, T v) : key(k), value(v), degree(0), marked(false),
                            parent(nullptr), child(nullptr), left(this), right(this) {}
     };
 
     Node* minNode;
     int n;
-    std::vector<Node*> nodeMapping;
+    vector<Node*> nodeMapping;
     long opCount;
 
     void addToRootList(Node* node) {
@@ -65,17 +66,17 @@ private:
 
     void consolidate() {
         if (!minNode) return;
-        int maxDegree = static_cast<int>(2 * std::log2(n + 1)) + 2;
-        std::vector<Node*> A(static_cast<size_t>(maxDegree), nullptr);
+        int maxDegree = static_cast<int>(2 * log2(n + 1)) + 2;
+        vector<Node*> A(static_cast<size_t>(maxDegree), nullptr);
 
         Node* start = minNode;
-        std::vector<Node*> roots;
+        vector<Node*> roots;
         Node* p = start;
         int count = 0;
         do {
             roots.push_back(p);
             p = p->right;
-            if (++count > n + 10) break;  // safety: prevent infinite loop on corrupt list
+            if (++count > n + 10) break;
         } while (p != start);
 
         for (Node* w : roots) {
@@ -86,7 +87,7 @@ private:
                     A.resize(A.size() * 2 + 1, nullptr);
                 if (!A[d]) break;
                 Node* y = A[d];
-                if (x->key > y->key) std::swap(x, y);
+                if (x->key > y->key) swap(x, y);
                 link(y, x);
                 A[d] = nullptr;
                 d++;

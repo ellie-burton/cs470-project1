@@ -4,19 +4,22 @@
 #include "PriorityQueue.h"
 #include <vector>
 #include <utility>
+using std::vector;
+using std::pair;
+using std::swap;
 
 template <typename T>
 class BinaryHeap : public PriorityQueue<T> {
 private:
-    std::vector<std::pair<int, T>> heap;  // (key, value)
-    std::vector<int> position;             // position[value] = index in heap, -1 if not present
+    vector<pair<int, T>> heap;
+    vector<int> position;  // value -> index, -1 if not in heap
     long opCount;
 
     void bubbleUp(int i) {
         while (i > 0) {
             int parent = (i - 1) / 2;
             if (heap[parent].first <= heap[i].first) break;
-            std::swap(heap[parent], heap[i]);
+            swap(heap[parent], heap[i]);
             position[heap[parent].second] = parent;
             position[heap[i].second] = i;
             i = parent;
@@ -34,7 +37,7 @@ private:
             if (right < n && heap[right].first < heap[smallest].first)
                 smallest = right;
             if (smallest == i) break;
-            std::swap(heap[i], heap[smallest]);
+            swap(heap[i], heap[smallest]);
             position[heap[i].second] = i;
             position[heap[smallest].second] = smallest;
             i = smallest;
@@ -59,7 +62,6 @@ public:
         outKey = heap[0].first;
         outValue = heap[0].second;
         position[outValue] = -1;
-
         if (heap.size() == 1) {
             heap.pop_back();
         } else {
@@ -74,7 +76,7 @@ public:
 
     void decreaseKey(T value, int newKey) override {
         int i = position[value];
-        if (i < 0) return;  // value not in heap
+        if (i < 0) return;
         if (newKey >= heap[i].first) return;
         heap[i].first = newKey;
         bubbleUp(i);

@@ -2,7 +2,7 @@
 #define GRAPH_H
 
 #include <vector>
-#include <utility> // for std::pair
+using std::vector;
 
 struct Edge {
     int target;
@@ -12,8 +12,7 @@ struct Edge {
 class Graph {
 public:
     int numVertices;
-    // Adjacency list: vector of vectors of Edges
-    std::vector<std::vector<Edge>> adjList;
+    vector<vector<Edge>> adjList;
 
     Graph(int n) : numVertices(n) {
         adjList.resize(n);

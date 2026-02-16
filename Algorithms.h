@@ -6,18 +6,19 @@
 #include <vector>
 #include <limits>
 
+using std::vector;
+
 const int INF = std::numeric_limits<int>::max();
 
 class Algorithms {
 public:
-    // Modular Dijkstra: insert when first seen, decreaseKey when already in PQ.
-    static void runDijkstra(const Graph& g, int startNode, PriorityQueue<int>* pq, std::vector<int>& dist) {
+    // dijkstra: insert when first seen, decreaseKey if already in pq
+    static void runDijkstra(const Graph& g, int startNode, PriorityQueue<int>* pq, vector<int>& dist) {
         int n = g.numVertices;
         dist.assign(n, INF);
         dist[startNode] = 0;
-
-        std::vector<bool> inPQ(n, false);
-        std::vector<bool> visited(n, false);
+        vector<bool> inPQ(n, false);
+        vector<bool> visited(n, false);
 
         pq->insert(0, startNode);
         inPQ[startNode] = true;
@@ -28,12 +29,11 @@ public:
             inPQ[u] = false;
             if (visited[u]) continue;
             visited[u] = true;
-
+            // relax edges out of u
             for (const auto& edge : g.adjList[u]) {
                 int v = edge.target;
                 int weight = edge.weight;
                 int newDist = dist[u] + weight;
-
                 if (!visited[v] && newDist < dist[v]) {
                     dist[v] = newDist;
                     if (inPQ[v])
@@ -47,15 +47,14 @@ public:
         }
     }
 
-    // Prim's MST: minEdge[v] = weight of edge connecting v to MST; totalWeight = sum of minEdge.
+    // prim: minEdge[v] = min edge weight into current MST
     static void runPrim(const Graph& g, int startNode, PriorityQueue<int>* pq,
-                        std::vector<int>& minEdge, int& totalWeight) {
+                        vector<int>& minEdge, int& totalWeight) {
         int n = g.numVertices;
         minEdge.assign(n, INF);
         minEdge[startNode] = 0;
-
-        std::vector<bool> inPQ(n, false);
-        std::vector<bool> inMST(n, false);
+        vector<bool> inPQ(n, false);
+        vector<bool> inMST(n, false);
 
         pq->insert(0, startNode);
         inPQ[startNode] = true;
@@ -65,10 +64,9 @@ public:
             int key, u;
             pq->extractMin(key, u);
             inPQ[u] = false;
-            if (inMST[u]) continue;
+            if (inMST[u]) continue;  // duplicate extract, skip
             inMST[u] = true;
             totalWeight += key;
-
             for (const auto& edge : g.adjList[u]) {
                 int v = edge.target;
                 int w = edge.weight;
