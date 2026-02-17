@@ -70,14 +70,21 @@ Space: *O*(*n*) for all three heaps (each vertex has at most one heap node at a 
 
 ### 4.1 Experimental Setup
 
-- **Platform:** Single run per configuration; time measured with `std::chrono::high_resolution_clock` in **microseconds** (TimeUS); operation count = insert + extractMin + decreaseKey.
-- **Graph types:**
-  - **Random sparse:** ~5·*n* undirected edges, weights 1–100.
-  - **Random dense:** ~15% of *n*(*n*−1)/2 edges, weights 1–100.
-  - **Grid:** 2D grid (4-neighbor), weights 1–100; sizes 10×10, 22×23, 32×32, 70×72.
-  - **Worst-case (layered):** √*n* layers, full bipartite edges between adjacent layers to stress decrease-key.
-- **Sizes:** *n* = 100, 500 (small), 1000, 5000 (large) for random and worst-case; grid *n* = 100, 506, 1024, 5040.
-- **Correctness:** For each graph, Dijkstra distances and Prim MST total weight are compared across the three heaps; no mismatches were reported (all heaps agreed).
+For the measurement data that was gathered during this project, we collected data using a single run per configuration. The execution time was measured in microseconds and can be done using the <chrono> library, using the std::chrono::high_resolution_clock in microseconds (TimeUS).
+This covers the enter algorithm execution
+All heap ops
+Logic Loops
+Edge relaxations
+Comparison.
+Pointer or array updated
+
+The logical counter or operation count was computed as count = insert + extractMin + decreaseKey.This covered how much abstract heap work each implementation performed.
+Four graph type families were tested in this project.
+Random sparse: Contained approximately 5·n edges. 
+Random dense: Contained approximately 15% of all possible edges. 
+Grid: Used a 2D(4-neighbor) lattice.
+Layered: Constructed with  √n layers and complete bipartite connections between 		adjacent layers to increase the frequency of decrease key operations.
+Graph sizes ranged from n = 100 and 500 for smaller tests and n =1000 and 5000 for larger tests.Grid sizes ranged from 10  by 10 all the way up to 70 by 70. For every graph, Dijkstra and Prim were compared across all heap implementations. No discrepancies were found. 
 
 ### 4.2 Results Summary
 
@@ -129,9 +136,10 @@ Data below are from **results.txt** (time in µs, Ops = heap operation count).
 
 ### 4.3 Observations
 
-- **Time:** Binary is fastest in every configuration; Pairing is slowest; Fibonacci is in between (typically ~2–3× Binary, and faster than Pairing).
-- **Ops:** Pairing has the fewest operations in every configuration; Binary and Fibonacci have nearly the same op counts (often within a few percent).
-- **Scaling:** As *n* and *m* grow, the time gap between Binary and Pairing widens (e.g., random dense *n*=5000: Binary ~15 ms, Pairing ~28–31 ms).
+Across all graph classes(and sizes)the binary heap consistently produced the lowest wall clock times. The pairing heap consistently produced the highest wall clock times. While the Fibonacci heap fell between the two, never the fastest. This ordering held true for both Dihstra and Prim and did not change with graph density or structure. 
+Operation counts showed a different pattern for the heaps that were being viewed. Pairing heaps executed fewer total operations than both the binary and Fibonacci heap in every configuration tested. While Binary and Fibonacci heaps showed nearly identical operations counts, which only differed by a small inconceivable margin(often within a few percent). Lower operation counts for painting did not translate into faster processed times. 
+When looking at the increase in graph size, the time gap between binary and pairing heaps grew. This effect was visible in both sparse and dense random graphs, as well as layered graphs that were designed to stress the decreased key behavior. Grid graphs also showed lower tuntimes for all heaps due to the bounded degree, but overall performance did remain similar. 
+
 - **Correctness:** All three heaps produced identical Dijkstra distances and identical Prim MST total weights on every run; no correctness warnings.
 
 ---
@@ -139,21 +147,20 @@ Data below are from **results.txt** (time in µs, Ops = heap operation count).
 ## 5. Comparative Discussion
 
 **Do Fibonacci heaps provide practical benefits?**  
-In our experiments, **no**: Fibonacci heaps were always slower than the binary heap in wall-clock time, despite having better asymptotic complexity. The gain from fewer operations (which was small; op counts were close to Binary) did not offset the cost of pointer manipulation, consolidation, and cascading cut. For the graph sizes and platforms we used, the binary heap’s simplicity and cache friendliness dominate.
-
+Throughout each instance of this project, Fibonacci heaps did not seem to provide any practical performance benefit. Even though they were theorized that amortized bounds are better for decreasing key operations, their measured run times in our practice were consistently higher than those of binary heaps. The type of reduction that the Fibonacci heaps are designed to produce was cheaper in theory, but because we did not look at graphs large enough for the asymptotic operations advantage to dominate, we did not see that in our study.
 **How do pairing heaps compare in practice?**  
-Pairing heaps did **fewer** heap operations than both Binary and Fibonacci in every test, which is consistent with their design as a “lazy” self-adjusting structure. Nevertheless, they were the **slowest** in time. Each operation (especially merge and decrease-key) does more pointer work and has worse locality than the binary heap’s array-based operations. So in our implementation, the constant factors of the pairing heap outweigh its advantage in operation count.
+Pairing heaps reduced the amount of heap operations more than the alternative heaps of binary or fibonacci. In practice, this suggests that their structure that is self adjusting does limit their restructuring work at an algorithmic level. But, for each individual operation that it does iterate through it appears to be more expensive. With pointer traversal, repeated merges, and its weaker memory locality, in this practice it contributed to its higher run time.
 
 **Which algorithm benefits more from advanced heaps?**  
-Neither Dijkstra nor Prim benefited in *time* from using Pairing or Fibonacci instead of Binary; both algorithms ran fastest with the binary heap. In terms of *operation count*, Pairing reduced ops for both algorithms by a similar proportion (roughly 10–40% fewer ops than Binary/Fibonacci depending on graph). So the “benefit” of advanced heaps here shows up only in op count, not in runtime.
+Neither of the algorithms showed/ produced a more meaningful runtime than the other when using the Fibonacci or pairing heap instead of a binary heap. Differences between these two algorithms were modest, meaning prim triggered more key decrease operations and did not change the relative ranking of heap performance.
 
 **How does graph structure affect performance?**  
-- **Sparse vs dense:** Dense graphs increase time and ops for all heaps; the relative ordering (Binary &lt; Fibonacci &lt; Pairing in time) stayed the same.  
-- **Grid vs random:** Grids have bounded degree, so ops and time grow more gently; the same ordering holds.  
-- **Worst-case (layered):** Designed to stress decrease-key. Pairing still did the fewest ops but remained slowest in time; Binary stayed fastest. So graph structure did not change which heap was practically best.
+Graph structure influenced absolute cost but not relative outcomes. The dense graphs increased the overall total work off the heaps. Grid graphs focused on reducing the work due to its bounded degree. Layered graphs increased the decrease in key frequency. But in all cases binary heaps still remained fastest. The pairing heaps the slowest, and Fibonacci in the middle.
+
 
 **Why theory and practice differ**  
-Asymptotic analysis assumes a RAM model where pointer updates and comparisons have unit cost and ignores cache effects. In practice, the binary heap’s array layout yields good cache behavior and few instructions per operation. Fibonacci and pairing heaps incur more pointer chasing, more branches, and more memory traffic per operation. For *n* in the thousands and typical *m*, log *n* is small (e.g., ~12 for *n*=5000), so the difference between O(*m* log *n*) and O(*m* + *n* log *n*) is not large, and constant factors decide the winner. Our results align with the common observation that Fibonacci (and in our case pairing) heaps are often slower than binary heaps for graph algorithms at moderate scale.
+Why theory and practice differ
+When comparing theory and practice, the results suggest a gap between asymptotic guarantees and observed performance at the tested problem sizes. Theoretical models do not account for many factors that affect instruction level cost, including cache behavior, memory access patterns, and pointer overhead. In this setting, simpler data structures with predictable access patterns appeared to be more effective, even when they performed more abstract operations.
 
 ---
 
