@@ -27,7 +27,7 @@ private:
     }
 
     void bubbleDown(int i) {
-        int n = static_cast<int>(heap.size());
+        int n = (int)heap.size();
         while (true) {
             int left = 2 * i + 1;
             int right = 2 * i + 2;
@@ -50,7 +50,7 @@ public:
     }
 
     void insert(int key, T value) override {
-        int i = static_cast<int>(heap.size());
+        int i = (int)heap.size();
         heap.push_back({key, value});
         position[value] = i;
         bubbleUp(i);

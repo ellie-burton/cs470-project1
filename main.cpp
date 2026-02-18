@@ -35,8 +35,8 @@ void generateRandomSparse(Graph& g, int edgeMultiplier) {
 // frac of max edges n(n-1)/2
 void generateRandomDense(Graph& g, double edgeFraction) {
     int n = g.numVertices;
-    long maxEdges = static_cast<long>(n) * (n - 1) / 2;
-    long target = static_cast<long>(maxEdges * edgeFraction);
+    long maxEdges = (long)n * (n - 1) / 2;
+    long target = (long)(maxEdges * edgeFraction);
     for (long i = 0; i < target; i++) {
         int u = rand() % n;
         int v = rand() % n;
@@ -70,7 +70,7 @@ void generateGrid(Graph& g, int rows, int cols) {
 void generateWorstCaseLayered(Graph& g) {
     int n = g.numVertices;
     if (n <= 1) return;
-    int L = static_cast<int>(sqrt(n));
+    int L = (int)sqrt(n);
     if (L < 2) L = 2;
     vector<int> layerStart(L + 1);
     int perLayer = (n + L - 1) / L;

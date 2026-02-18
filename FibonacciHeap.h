@@ -66,8 +66,8 @@ private:
 
     void consolidate() {
         if (!minNode) return;
-        int maxDegree = static_cast<int>(2 * log2(n + 1)) + 2;
-        vector<Node*> A(static_cast<size_t>(maxDegree), nullptr);
+        int maxDegree = (int)(2 * log2(n + 1)) + 2;
+        vector<Node*> A((size_t)maxDegree, nullptr);
 
         Node* start = minNode;
         vector<Node*> roots;
@@ -76,14 +76,14 @@ private:
         do {
             roots.push_back(p);
             p = p->right;
-            if (++count > n + 10) break;
+            if (++count > n) break;
         } while (p != start);
 
         for (Node* w : roots) {
             Node* x = w;
             int d = x->degree;
             while (true) {
-                if (static_cast<size_t>(d) >= A.size())
+                if ((size_t)d >= A.size())
                     A.resize(A.size() * 2 + 1, nullptr);
                 if (!A[d]) break;
                 Node* y = A[d];
@@ -92,7 +92,7 @@ private:
                 A[d] = nullptr;
                 d++;
             }
-            if (static_cast<size_t>(d) >= A.size())
+            if ((size_t)d >= A.size())
                 A.resize(A.size() * 2 + 1, nullptr);
             A[d] = x;
         }
@@ -127,17 +127,6 @@ private:
     }
 
     void cascadingCut(Node* y) {
-        Node* z = y->parent;
-        if (!z) return;
-        if (!y->marked) {
-            y->marked = true;
-        } else {
-            cut(y, z);
-            cascadingCut(z);
-        }
-    }
-
-    void cascadingCutIterative(Node* y) {
         for (Node* z = y->parent; z; z = y->parent) {
             if (!y->marked) {
                 y->marked = true;
@@ -156,7 +145,7 @@ public:
 
     void insert(int key, T value) override {
         Node* newNode = new Node(key, value);
-        if (!nodeMapping.empty() && value >= 0 && value < static_cast<int>(nodeMapping.size()))
+        if (!nodeMapping.empty() && value >= 0 && value < (int)nodeMapping.size())
             nodeMapping[value] = newNode;
         addToRootList(newNode);
         if (!minNode || key < minNode->key)
@@ -169,7 +158,7 @@ public:
         if (!minNode) return false;
         outKey = minNode->key;
         outValue = minNode->value;
-        if (!nodeMapping.empty() && outValue >= 0 && outValue < static_cast<int>(nodeMapping.size()))
+        if (!nodeMapping.empty() && outValue >= 0 && outValue < (int)nodeMapping.size())
             nodeMapping[outValue] = nullptr;
 
         if (minNode->child) {
@@ -197,7 +186,7 @@ public:
     }
 
     void decreaseKey(T value, int newKey) override {
-        if (nodeMapping.empty() || value < 0 || value >= static_cast<int>(nodeMapping.size())) return;
+        if (nodeMapping.empty() || value < 0 || value >= (int)nodeMapping.size()) return;
         Node* node = nodeMapping[value];
         if (!node) return;
         if (newKey >= node->key) return;
@@ -206,7 +195,7 @@ public:
         Node* parent = node->parent;
         if (parent && newKey < parent->key) {
             cut(node, parent);
-            cascadingCutIterative(parent);
+            cascadingCut(parent);
         }
         if (newKey < minNode->key)
             minNode = node;

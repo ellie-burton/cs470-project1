@@ -53,7 +53,7 @@ private:
 
         vector<Node*> nodes;
         unordered_set<Node*> seen;
-        const size_t maxNodes = 100000;
+        const size_t maxNodes = 1u << 20;
         for (Node* p = firstSibling; p && nodes.size() < maxNodes; p = p->sibling) {
             if (seen.count(p)) break;
             seen.insert(p);
@@ -71,7 +71,7 @@ private:
         }
 
         Node* result = pass1.back();
-        for (int i = static_cast<int>(pass1.size()) - 2; i >= 0; --i)
+        for (int i = (int)pass1.size() - 2; i >= 0; --i)
             result = merge(pass1[i], result);
         return result;
     }
@@ -84,7 +84,7 @@ public:
 
     void insert(int key, T value) override {
         Node* newNode = new Node(key, value, nextSeq++);
-        if (value >= 0 && value < static_cast<int>(nodeMapping.size()))
+        if (value >= 0 && value < (int)nodeMapping.size())
             nodeMapping[value] = newNode;
         root = merge(root, newNode);
         if (root) root->prev = nullptr;
@@ -95,7 +95,7 @@ public:
         if (!root) return false;
         outKey = root->key;
         outValue = root->value;
-        if (outValue >= 0 && outValue < static_cast<int>(nodeMapping.size()))
+        if (outValue >= 0 && outValue < (int)nodeMapping.size())
             nodeMapping[outValue] = nullptr;
 
         Node* oldRoot = root;
@@ -115,7 +115,7 @@ public:
     }
 
     void decreaseKey(T value, int newKey) override {
-        if (value < 0 || value >= static_cast<int>(nodeMapping.size())) return;
+        if (value < 0 || value >= (int)nodeMapping.size()) return;
         Node* node = nodeMapping[value];
         if (!node) return;
         if (newKey >= node->key) return;
