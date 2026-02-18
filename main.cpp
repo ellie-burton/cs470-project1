@@ -181,7 +181,7 @@ int main() {
     cout << header;
 
     const int smallSizes[] = { 100, 500 };
-    const int largeSizes[] = { 1000, 5000 };
+    const int largeSizes[] = { 5000, 10000 };
     const int numSmall = sizeof(smallSizes) / sizeof(smallSizes[0]);
     const int numLarge = sizeof(largeSizes) / sizeof(largeSizes[0]);
 
