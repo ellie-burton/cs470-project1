@@ -7,7 +7,7 @@ This project runs a comparative performance analysis across:
 
 - Algorithms: Dijkstra vs Prim  
 - Heaps: Binary (baseline), Pairing, Fibonacci  
-- Graph sizes: small (100-500) vs large (1000-5000)
+- Graph sizes: small (n = 100-500) vs large (n = 5,000-10,000)
 - Graph types: random graphs (sparse/dense), grid graphs, and synthetic worst-case (layered) graphs.  
 
 It measures runtime and operation counts and checks correctness across heaps.
@@ -76,7 +76,3 @@ Run the main experiments (Dijkstra and Prim with Binary, Pairing, and Fibonacci 
   - **GraphType:** e.g. `sparse`, `dense`, `grid_10x10`, `layered`.
 
 -- -
-
-## Further Information
-.
-- **Report:** See **report.md** for the written report outline and analysis.
